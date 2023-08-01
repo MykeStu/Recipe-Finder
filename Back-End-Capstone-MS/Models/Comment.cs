@@ -1,5 +1,6 @@
 ﻿using Microsoft.Identity.Client;
 using System;
+using System.Collections.Generic;
 
 namespace Back_End_Capstone_MS.Models
 {
@@ -10,6 +11,6 @@ namespace Back_End_Capstone_MS.Models
         public int RecipeId { get; set; }
         public string Message { get; set; }
         public DateTime DateCreated { get; set; }
-        public int Likes { get; set; }
+        public List<CommentLike> CommentLikes { get; set; }
     }
 }

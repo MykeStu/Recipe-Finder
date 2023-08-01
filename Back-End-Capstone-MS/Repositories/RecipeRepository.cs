@@ -2,6 +2,7 @@
 using Back_End_Capstone_MS.Utils;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Back_End_Capstone_MS.Repositories
 {
@@ -54,27 +55,28 @@ namespace Back_End_Capstone_MS.Repositories
                 {
                     cmd.CommandText = @"
                         SELECT r.Id as rId, r.Difficulty, r.[Name], r.Instructions, r.DateCreated, r.ImageUrl as RecipeImage,
-                        u.DisplayName, u.Id as uId, t.Name as TagName, i.Name IngredientName FROM Recipe r
+                        u.DisplayName, u.Id as uId, t.Name as TagName, i.Name as IngredientName                   
                         JOIN [User] u on r.UserId = u.Id
                         WHERE r.Hidden = 0";
                     using (var reader = cmd.ExecuteReader())
                     {
+                        var recipe = new Recipe();
                         var recipes = new List<Recipe>();
                         while (reader.Read())
                         {
-                            var recipe = new Recipe()
+                            if(recipe.Id != DbUtils.GetInt(reader, "rId"))
                             {
-                                Id = DbUtils.GetInt(reader, "rId"),
-                                Difficulty = DbUtils.GetInt(reader, "Difficulty"),
-                                Name = DbUtils.GetString(reader, "Name"),
-                                Instructions = DbUtils.GetString(reader, "Instructions"),
-                                DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
-                                ImageUrl = DbUtils.GetString(reader, "RecipeImage"),
-                                User = new User()
+                                recipe.Id = DbUtils.GetInt(reader, "rId");
+                                recipe.Difficulty = DbUtils.GetInt(reader, "Difficulty");
+                                recipe.Name = DbUtils.GetString(reader, "Name");
+                                recipe.Instructions = DbUtils.GetString(reader, "Instructions");
+                                recipe.DateCreated = DbUtils.GetDateTime(reader, "DateCreated");
+                                recipe.ImageUrl = DbUtils.GetString(reader, "RecipeImage");
+                                recipe.User = new User()
                                 {
                                     Id = DbUtils.GetInt(reader, "uId"),
                                     DisplayName = DbUtils.GetString(reader, "DisplayName")
-                                }
+                                };
                             };
                             recipes.Add(recipe);
                         }
@@ -125,8 +127,8 @@ namespace Back_End_Capstone_MS.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                         SELECT r.Id as rId, r.Difficulty, r.[Name], r.Instructions, r.DateCreated, r.ImageUrl as RecipeImage,
-                        u.DisplayName, u.Id as uId, t.Name as TagName, i.Name IngredientName FROM Recipe r
+                        SELECT r.Id as rId, r.Difficulty, r.[Name], r.Instructions, r.DateCreated, r.ImageUrl as RecipeImage,
+                        u.DisplayName, u.Id as uId FROM Recipe r
                         JOIN [User] u on r.UserId = u.Id
                         WHERE r.Hidden = 0 AND r.Difficulty = @difficulty";
                     DbUtils.AddParameter(cmd, "@difficulty", difficulty);
@@ -156,10 +158,60 @@ namespace Back_End_Capstone_MS.Repositories
                 }
             }
         }
-
+        //comments will be a separate query from the comment repository
         public Recipe GetById(int id)
         {
-            throw new System.NotImplementedException();
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT r.Id as rId, r.Difficulty, r.[Name], r.Instructions, r.DateCreated, r.ImageUrl as RecipeImage,
+                        u.DisplayName, u.Id as uId FROM Recipe r
+                        JOIN [User] u on r.UserId = u.Id
+                        WHERE r.Id = @id";
+                    DbUtils.AddParameter(cmd, "@id", id);
+                    using (var reader = cmd.ExecuteReader()) 
+                    {
+                        var recipe = new Recipe();
+                        while (reader.Read())
+                        {
+                            if(recipe.Id != DbUtils.GetInt(reader, "rId"))
+                                {
+                                recipe.Id = DbUtils.GetInt(reader, "rId");
+                                recipe.Difficulty = DbUtils.GetInt(reader, "Difficulty");
+                                recipe.Name = DbUtils.GetString(reader, "Name");
+                                recipe.Instructions = DbUtils.GetString(reader, "Instructions");
+                                recipe.DateCreated = DbUtils.GetDateTime(reader, "DateCreated");
+                                recipe.ImageUrl = DbUtils.GetString(reader, "RecipeImage");
+                                recipe.User = new User()
+                                {
+                                    Id = DbUtils.GetInt(reader, "uId"),
+                                    DisplayName = DbUtils.GetString(reader, "DisplayName")                              
+                                };
+                                recipe.Ingredients.Add(new Ingredient()
+                                {
+
+                                });
+                                recipe.Tags.Add(new Tag()
+                                {
+
+                                });
+                                recipe.Comments.Add(new Comment()
+                                {
+
+                                });
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        return recipe;
+                    }
+                }
+            }
         }
 
         public List<Recipe> GetByTag(int tagId)
