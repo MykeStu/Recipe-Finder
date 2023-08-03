@@ -13,19 +13,14 @@ namespace Back_End_Capstone_MS.Controllers
     {
         private readonly IRecipeRepository _recipeRepository;
         private readonly IRecipeLikeRepository _recipeLikeRepository;
-        private readonly IRecipeTagRepository _recipeTagRepository;
         private readonly ICommentRepository _commentRepository;
-        private readonly IRecipeIngredientRepository _recipeIngredientRepository;
         private readonly ICommentLikeRepository _commentLikeRepository;
-        public RecipeController(IRecipeRepository recipeRepository, IRecipeLikeRepository recipeLikeRepository, IRecipeTagRepository recipeTagRepository
-            , ICommentRepository commentRepository, IRecipeIngredientRepository recipeIngredientRepository, ICommentLikeRepository commentLikeRepository)
+        public RecipeController(IRecipeRepository recipeRepository, IRecipeLikeRepository recipeLikeRepository,
+            ICommentRepository commentRepository, ICommentLikeRepository commentLikeRepository)
         {
             _recipeRepository = recipeRepository;
             _recipeLikeRepository = recipeLikeRepository;
-            _recipeTagRepository = recipeTagRepository;
             _commentRepository = commentRepository;
-            _recipeTagRepository = recipeTagRepository;
-            _recipeIngredientRepository = recipeIngredientRepository;
             _commentLikeRepository = commentLikeRepository;
         }
 
@@ -34,13 +29,11 @@ namespace Back_End_Capstone_MS.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var recipes = _recipeRepository.GetAllPublic();
-            foreach (var recipe in recipes)
+            var recipes = _recipeRepository.GetAll();
+            foreach(Recipe r in recipes)
             {
-                recipe.Comments = _commentRepository.GetByRecipeId(recipe.Id);
-                recipe.RecipeLikes = _recipeLikeRepository.GetByRecipeId(recipe.Id);
-                recipe.RecipeTags = _recipeTagRepository.GetByRecipeId(recipe.Id);
-                recipe.RecipeIngredients = _recipeIngredientRepository.GetByRecipeId(recipe.Id);
+                r.Comments = _commentRepository.GetByRecipeId(r.Id);
+                r.RecipeLikes = _recipeLikeRepository.GetByRecipeId(r.Id);
             }
             if (recipes == null)
             {
@@ -49,16 +42,27 @@ namespace Back_End_Capstone_MS.Controllers
             return Ok(recipes);
         }
 
+        //[Authorize]
+        [HttpGet("userRecipes/{userId}")]
+        public IActionResult GetByUserId(int userId)
+        {
+            var recipes = _recipeRepository.GetByUserId(userId);
+            
+            if (recipes == null)
+            {
+                return NotFound();
+            }
+            return Ok(recipes);
+        }
+
         // GET api/<RecipeController>/5
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
             var recipe = _recipeRepository.GetById(id);
-            recipe.RecipeTags = _recipeTagRepository.GetByRecipeId(id);
             recipe.RecipeLikes = _recipeLikeRepository.GetByRecipeId(id);
             recipe.Comments = _commentRepository.GetByRecipeId(id);
-            recipe.RecipeIngredients = _recipeIngredientRepository.GetByRecipeId(id);
             foreach(Comment c in recipe.Comments)
             {
                 c.CommentLikes = _commentLikeRepository.GetByCommentId(c.Id);

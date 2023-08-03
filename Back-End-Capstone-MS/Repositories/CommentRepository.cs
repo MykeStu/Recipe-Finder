@@ -117,7 +117,7 @@ namespace Back_End_Capstone_MS.Repositories
                     {
                         var comments = new List<Comment>();
                         var comment = new Comment();
-                        if (reader.Read())
+                        while (reader.Read())
                         {                                                    
                             comment.Id = DbUtils.GetInt(reader, "Id");
                             comment.UserId = DbUtils.GetInt(reader, "UserId");
@@ -141,7 +141,7 @@ namespace Back_End_Capstone_MS.Repositories
                 {
                     cmd.CommandText = @"
                         UPDATE Comment 
-                        SET ([Message] = @message)
+                        SET [Message] = @message
                         WHERE Id = @id";
                     DbUtils.AddParameter(cmd, "@id", comment.Id);
                     DbUtils.AddParameter(cmd, "@message", comment.Message);

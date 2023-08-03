@@ -29,12 +29,8 @@ namespace Back_End_Capstone_MS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IIngredientRepository, IngredientRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();          
             services.AddTransient<IRecipeRepository, RecipeRepository>();
-            services.AddTransient<ITagRepository, TagRepository>();
-            services.AddTransient<IRecipeIngredientRepository, RecipeIngredientRepository>();
-            services.AddTransient<IRecipeTagRepository, RecipeTagRepository>();
             services.AddTransient<IRecipeLikeRepository, RecipeLikeRepository>();
             services.AddTransient<ICommentLikeRepository, CommentLikeRepository>();
             services.AddTransient<ICommentRepository, CommentRepository>();
