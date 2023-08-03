@@ -2,6 +2,8 @@
 using Back_End_Capstone_MS.Repositories;
 using Back_End_Capstone_MS.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Back_End_Capstone_MS.Controllers
@@ -31,7 +33,7 @@ namespace Back_End_Capstone_MS.Controllers
         }
 
         [Authorize]
-        [HttpGet("FireBase/{FireBaseUserId}")]
+        [HttpGet("DoesUserExist/{FireBaseUserId}")]
         public IActionResult Get(string FireBaseUserId)
         {
             var user = _userRepository.GetByFireBaseUserId(FireBaseUserId);
@@ -45,30 +47,58 @@ namespace Back_End_Capstone_MS.Controllers
         // GET api/<UserController>/5
         [Authorize]
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            return "value";
+            var user = _userRepository.GetById(id);
+            if(user != null)
+            {
+                return Ok(user);
+            }
+            return NotFound();
         }
 
         // POST api/<UserController>
         [Authorize]
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post(User user)
         {
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            _userRepository.Add(user);
+            return CreatedAtAction("Get", new { id = user.Id }, user);
         }
 
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, User user)
         {
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            _userRepository.Update(user);
+            return NoContent();
+        }
+        [Authorize]
+        [HttpGet("Me")]
+        public IActionResult Me()
+        {
+            var user = GetCurrentUser();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
-        // DELETE api/<UserController>/5
-        [Authorize]
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        private User GetCurrentUser()
         {
+            var firebaseUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return _userRepository.GetByFireBaseUserId(firebaseUserId);
         }
     }
 }

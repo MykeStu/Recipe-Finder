@@ -42,23 +42,26 @@ public class UserRepository : BaseRepository, IUserRepository
             conn.Open();
             using (var cmd = conn.CreateCommand())
             {
-                cmd.CommandText = @"SELECT Id, DisplayName, Email, DateCreated, Admin, Active, FireBaseUserId FROM User
+                cmd.CommandText = @"SELECT Id, DisplayName, Email, DateCreated, [Admin], Active, FireBaseUserId FROM [User]
                                         WHERE FireBaseUserId = @fireBaseUserId";
                 DbUtils.AddParameter(cmd, "@fireBaseUserId", fireBaseUserId);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    User user = null;
                     if (reader.Read())
                     {
-                        user.Id = DbUtils.GetInt(reader, "Id");
-                        user.DisplayName = DbUtils.GetString(reader, "DisplayName");
-                        user.Email = DbUtils.GetString(reader, "Email");
-                        user.DateCreated = DbUtils.GetDateTime(reader, "DateCreated");
-                        user.Admin = reader.GetBoolean(reader.GetOrdinal("Admin"));
-                        user.Active = reader.GetBoolean(reader.GetOrdinal("Active"));
-                        user.FireBaseUserId = DbUtils.GetString(reader, "FireBaseUserId");
+                        var user = new User()
+                        {
+                            Id = DbUtils.GetInt(reader, "Id"),
+                            DisplayName = DbUtils.GetString(reader, "DisplayName"),
+                            Email = DbUtils.GetString(reader, "Email"),
+                            DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
+                            Admin = reader.GetBoolean(reader.GetOrdinal("Admin")),
+                            Active = reader.GetBoolean(reader.GetOrdinal("Active")),
+                            FireBaseUserId = DbUtils.GetString(reader, "FireBaseUserId")
+                        };
+                        return user;
                     }
-                    return user;
+                    else { return null; }
                 }
             }
         }

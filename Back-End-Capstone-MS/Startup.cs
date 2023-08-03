@@ -33,6 +33,11 @@ namespace Back_End_Capstone_MS
             services.AddTransient<IIngredientRepository, IngredientRepository>();
             services.AddTransient<IRecipeRepository, RecipeRepository>();
             services.AddTransient<ITagRepository, TagRepository>();
+            services.AddTransient<IRecipeIngredientRepository, RecipeIngredientRepository>();
+            services.AddTransient<IRecipeTagRepository, RecipeTagRepository>();
+            services.AddTransient<IRecipeLikeRepository, RecipeLikeRepository>();
+            services.AddTransient<ICommentLikeRepository, CommentLikeRepository>();
+            services.AddTransient<ICommentRepository, CommentRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -85,6 +90,13 @@ namespace Back_End_Capstone_MS
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Back_End_Capstone_MS v1"));
+
+                app.UseCors(options =>
+                {
+                    options.AllowAnyHeader();
+                    options.AllowAnyMethod();
+                    options.AllowAnyOrigin();
+                });
             }
 
             app.UseHttpsRedirection();

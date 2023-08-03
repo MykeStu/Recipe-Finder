@@ -109,7 +109,7 @@ namespace Back_End_Capstone_MS.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT c.Id, c.UserId, c.RecipeId, c.[Message], c.DateCreated, cl.Id AS likeId, cl.UserId AS likeUserId, cl.CommentId as likeCommentId
+                        SELECT c.Id, c.UserId, c.RecipeId, c.[Message], c.DateCreated
                         FROM Comment c
                         WHERE c.RecipeId = @recipeId";
                     DbUtils.AddParameter(cmd, "@recipeId", recipeId);

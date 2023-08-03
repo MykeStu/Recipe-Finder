@@ -15,8 +15,8 @@ namespace Back_End_Capstone_MS.Models
         public DateTime DateCreated { get; set; }
         public string ImageUrl { get; set; }
         public User User { get; set; }
-        public List<Tag> Tags { get; set; }
-        public List<Ingredient> Ingredients { get; set;}
+        public List<RecipeTag> RecipeTags { get; set; }
+        public List<RecipeIngredient> RecipeIngredients { get; set;}
         public List<Comment> Comments { get; set; }
         public List<RecipeLike> RecipeLikes { get; set; }
     }
